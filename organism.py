@@ -86,6 +86,7 @@ def build_polished_dapp(spec, cycle):
     4. STRICTLY use 'st.query_params' instead of 'st.experimental_get_query_params'.
     5. NO external images (they break). Use Emojis 🧬 or Streamlit icons for UI.
     6. Keep the UI clean: Use st.columns, st.expander, and st.metric.
+    7. STRICTLY ONLY import these from stellar_sdk: Server, Keypair, TransactionBuilder, Network, Asset, BadRequestError, NotFoundError. Do not import anything else.
     
     OUTPUT: Raw Python code only.
     """
