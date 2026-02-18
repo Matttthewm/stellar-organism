@@ -56,7 +56,6 @@ def conceive_holistic_system(history_summary):
     """
     try:
         model = genai.GenerativeModel(MODEL_NAME)
-        # Force JSON response type
         response = model.generate_content(
             prompt,
             generation_config={"response_mime_type": "application/json"}
@@ -86,9 +85,13 @@ def build_polished_dapp(spec, cycle):
     4. STRICTLY use 'st.query_params' instead of 'st.experimental_get_query_params'.
     5. NO external images (they break). Use Emojis 🧬 or Streamlit icons for UI.
     6. Keep the UI clean: Use st.columns, st.expander, and st.metric.
-    7. STRICTLY split imports: 
-       - Line 1: 'from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset'
-       - Line 2: 'from stellar_sdk.exceptions import BadRequestError, NotFoundError'
+    7. CRITICAL IMPORT RULES:
+       - Always include 'import stellar_sdk' at the top.
+       - Then: 'from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset'
+       - Then: 'from stellar_sdk.exceptions import BadRequestError, NotFoundError'
+       - NEVER import 'Ed22519PublicKeyInvalidError'. Use 'ValueError' for key validation.
+       - NEVER import 'AssetType'.
+    8. Access operations via the module, e.g., 'stellar_sdk.ChangeTrust(...)'.
     
     OUTPUT: Raw Python code only.
     """
@@ -120,7 +123,6 @@ st.write("A Living Library of Evolutionary dApps.")
 """)
 
 def clean_filename(name):
-    # Keep only alphanumeric and spaces, then replace spaces with underscores
     clean = re.sub(r'[^a-zA-Z0-9 ]', '', name)
     return clean.strip().replace(" ", "_").lower()
 
@@ -136,10 +138,7 @@ def main():
     if spec:
         code = build_polished_dapp(spec, cycle)
         
-        # NEW: Clean filename logic (removes colons, dashes, etc.)
         safe_name = clean_filename(spec['human_name'])
-        
-        # Ensure it's not too long
         if len(safe_name) > 30:
             safe_name = safe_name[:30]
             
