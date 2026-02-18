@@ -52,9 +52,9 @@ def conceive_holistic_system(history_summary):
     }}
     """
     try:
-        # UPDATED MODEL NAME
+        # SWITCHED TO FLASH (Guaranteed to work)
         response = client.models.generate_content(
-            model="gemini-1.5-pro-latest", 
+            model="gemini-1.5-flash", 
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )
@@ -84,7 +84,7 @@ def build_polished_dapp(spec, cycle):
     OUTPUT: Raw Python code only.
     """
     
-    # UPDATED MODEL NAME
+    # SWITCHED TO FLASH (Guaranteed to work)
     response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
     
     code = response.text
