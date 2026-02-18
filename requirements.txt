@@ -1,0 +1,5 @@
+google-genai
+stellar-sdk
+streamlit
+streamlit-javascript
+python-dotenv
