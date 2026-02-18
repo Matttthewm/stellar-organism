@@ -447,7 +447,7 @@ def listen_for_freighter_messages():
     )
     # Check for messages from the iframe (Streamlit's way to get JS output)
     if st.runtime.exists():
-        query_params = st.experimental_get_query_params()
+        query_params = query_params = st.query_params
         if "freighter_callback" in query_params:
             payload_str = query_params["freighter_callback"][0]
             st.session_state.freighter_response = json.loads(base64.b64decode(payload_str).decode())
