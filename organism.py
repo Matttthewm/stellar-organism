@@ -112,11 +112,20 @@ def build_polished_dapp(spec, cycle):
        - ALWAYS use: 'import streamlit.components.v1 as components'
        - ALWAYS call: 'components.html(...)'. 
        - NEVER call 'html(...)' directly from 'streamlit'.
-       - NEVER assign the result of components.html to a variable (it returns None).
     
     10. SIDEBAR MANDATE:
         - At the very top of the sidebar, display the App Name and Concept using 'st.sidebar.info()' or 'st.sidebar.markdown()'.
         - Show the 'Visual Style' in the sidebar as a badge/caption.
+
+    11. SECRET KEY HANDLING:
+        - NEVER assume 'st.secrets' exists or has keys.
+        - ALWAYS implement a 'Demo Mode' fallback:
+          if "ISSUER_KEY" in st.secrets:
+              key = st.secrets["ISSUER_KEY"]
+          else:
+              if "demo_key" not in st.session_state: st.session_state.demo_key = Keypair.random().secret
+              key = st.session_state.demo_key
+              st.warning("Using Ephemeral Demo Keys")
     
     OUTPUT: Raw Python code only.
     """
@@ -148,7 +157,6 @@ st.write("A Living Library of Evolutionary dApps.")
 """)
 
 def clean_filename(name):
-    # Keep only alphanumeric and spaces, then replace spaces with underscores
     clean = re.sub(r'[^a-zA-Z0-9 ]', '', name)
     return clean.strip().replace(" ", "_").lower()
 
