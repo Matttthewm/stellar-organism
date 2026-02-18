@@ -1,7 +1,8 @@
 import os
 import random
 import json
-from google import genai
+import google.generativeai as genai
+import time
 
 # --- CONFIGURATION ---
 try:
@@ -11,14 +12,17 @@ except ImportError:
     pass
 
 API_KEY = os.getenv("GEMINI_API_KEY") 
-REPO_PATH = "." 
 PAGES_DIR = "pages"
 
 if not API_KEY:
     print("❌ CRITICAL ERROR: API Key missing.")
     exit(1)
 
-client = genai.Client(api_key=API_KEY)
+# --- BRAIN TRANSPLANT: STANDARD LIBRARY SETUP ---
+genai.configure(api_key=API_KEY)
+
+# Use the standard Flash model
+MODEL_NAME = 'gemini-1.5-flash'
 
 STELLAR_OPS = [
     "ManageData", "Payment", "PathPaymentStrictReceive", "ManageBuyOffer",
@@ -52,11 +56,11 @@ def conceive_holistic_system(history_summary):
     }}
     """
     try:
-        # SWITCHED TO FLASH (Guaranteed to work)
-        response = client.models.generate_content(
-            model="gemini-1.5-flash", 
-            contents=prompt,
-            config={'response_mime_type': 'application/json'}
+        model = genai.GenerativeModel(MODEL_NAME)
+        # Force JSON response type
+        response = model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
         )
         return json.loads(response.text)
     except Exception as e:
@@ -84,8 +88,8 @@ def build_polished_dapp(spec, cycle):
     OUTPUT: Raw Python code only.
     """
     
-    # SWITCHED TO FLASH (Guaranteed to work)
-    response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
+    model = genai.GenerativeModel(MODEL_NAME)
+    response = model.generate_content(prompt)
     
     code = response.text
     if "```python" in code:
