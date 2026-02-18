@@ -30,40 +30,32 @@ STELLAR_OPS = [
     "BeginSponsoringFutureReserves", "RevokeSponsorship"
 ]
 
-# --- 1. THE ARCHITECT (Variety Seeker) ---
+# --- 1. THE ARCHITECT (Variety Engine) ---
 def conceive_holistic_system(history_summary):
     print(f"\n🧠 Conceiving System (Focus: Variety)...")
     num_ops = random.randint(3, 5) 
     ingredients = random.sample(STELLAR_OPS, num_ops)
     
-    # Randomize the "Vibe" to force visual diversity
     vibes = [
         "Cyberpunk/High-Tech", "Organic/Nature-Inspired", "Retro/Pixel-Art", 
         "Minimalist/Swiss-Design", "Mystical/Arcane", "Industrial/Blueprint",
-        "Playful/Gamified"
+        "Playful/Gamified", "Abstract/Mathematical"
     ]
     selected_vibe = random.choice(vibes)
 
     prompt = f"""
-    You are the 'Stellar Organism'. You are an avant-garde software creator.
+    You are the 'Stellar Organism'. An avant-garde software creator.
     
-    YOUR INGREDIENTS (Stellar Operations): {ingredients}
+    YOUR INGREDIENTS: {ingredients}
     RECENT HISTORY: {history_summary}
     
     OBJECTIVE: 
-    Invent a 'Stellar dApp' that uses these primitives.
+    Invent a 'Stellar dApp' that uses these primitives in a weird, specific, or creative way.
     
-    CRITICAL CREATIVE INSTRUCTION:
-    Look at the 'RECENT HISTORY'. Do not repeat the same themes, naming conventions, or styles as the previous apps.
-    If the last app was "Corporate Finance", make this one "Playful Game".
-    If the last app was "Abstract", make this one "Utilitarian".
-    
-    NAMING:
-    - You are allowed to use any words, but try to avoid generic Fintech names (like "Flow", "Link", "Pay") unless necessary.
-    - Be creative. Metaphorical names are encouraged (e.g., "Digital_Garden", "Time_Capsule", "Neon_Ledger").
-    
-    VISUAL STYLE:
-    - This app MUST have a "{selected_vibe}" aesthetic.
+    CREATIVE RULES:
+    1. Look at the HISTORY. Do NOT repeat themes. If the last app was serious, make this one fun.
+    2. NAMING: Avoid generic fintech names (Flow, Link, Pay). Use metaphorical names (e.g., "Glass_Ledger", "Time_Vortex", "Pixel_Bank").
+    3. STYLE: Must be "{selected_vibe}".
     
     OUTPUT JSON:
     {{
@@ -102,16 +94,29 @@ def build_polished_dapp(spec, cycle):
     2. Stellar SDK for XDR.
     3. Custom CSS for style "{spec['visual_style']}".
     4. STRICTLY use 'st.query_params' instead of 'st.experimental_get_query_params'.
-    5. NO external images (they break). Use Emojis 🧬 or Streamlit icons for UI.
+    5. NO external images. Use Emojis 🧬 only.
     6. Keep the UI clean: Use st.columns, st.expander, and st.metric.
+    
     7. CRITICAL IMPORT RULES:
        - Always include 'import stellar_sdk' at the top.
        - Then: 'from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset'
        - Then: 'from stellar_sdk.exceptions import BadRequestError, NotFoundError'
-       - NEVER import 'Ed22519PublicKeyInvalidError'. Use 'ValueError' for key validation.
+       - NEVER import 'Ed22519PublicKeyInvalidError'. Use 'ValueError'.
        - NEVER import 'AssetType'.
-    8. Access operations via the module, e.g., 'stellar_sdk.ChangeTrust(...)'.
-    9. NEVER pass 'timeout' to 'Server()'. Use 'Server(HORIZON_URL)' only.
+    
+    8. STELLAR SERVER RULES:
+       - Use 'Server(HORIZON_URL)' only. NEVER pass 'timeout' to Server().
+       - Access operations via module: 'stellar_sdk.ChangeTrust(...)'.
+    
+    9. HTML COMPONENT RULES:
+       - ALWAYS use: 'import streamlit.components.v1 as components'
+       - ALWAYS call: 'components.html(...)'. 
+       - NEVER call 'html(...)' directly from 'streamlit'.
+       - NEVER assign the result of components.html to a variable (it returns None).
+    
+    10. SIDEBAR MANDATE:
+        - At the very top of the sidebar, display the App Name and Concept using 'st.sidebar.info()' or 'st.sidebar.markdown()'.
+        - Show the 'Visual Style' in the sidebar as a badge/caption.
     
     OUTPUT: Raw Python code only.
     """
