@@ -20,7 +20,7 @@ if not API_KEY:
 
 # --- STANDARD LIBRARY SETUP ---
 genai.configure(api_key=API_KEY)
-MODEL_NAME = 'gemini-1.5-flash'
+MODEL_NAME = 'gemini-2.5-flash'
 
 STELLAR_OPS = [
     "ManageData", "Payment", "PathPaymentStrictReceive", "ManageBuyOffer",
