@@ -1,6 +1,7 @@
 import os
 import random
 import json
+import re
 import google.generativeai as genai
 import time
 
@@ -47,9 +48,9 @@ def conceive_holistic_system(history_summary):
     
     OUTPUT JSON:
     {{
-        "human_name": "The Public Name",
+        "human_name": "Short Punchy Name", 
         "system_concept": "The interaction of primitives.",
-        "visual_style": "The aesthetic vibe.",
+        "visual_style": "Minimalist, High-Contrast, Futuristic",
         "ingredients": {json.dumps(ingredients)}
     }}
     """
@@ -82,6 +83,9 @@ def build_polished_dapp(spec, cycle):
     1. Freighter Integration (st.components.v1.html + signTransaction).
     2. Stellar SDK for XDR.
     3. Custom CSS for style "{spec['visual_style']}".
+    4. STRICTLY use 'st.query_params' instead of 'st.experimental_get_query_params'.
+    5. NO external images (they break). Use Emojis 🧬 or Streamlit icons for UI.
+    6. Keep the UI clean: Use st.columns, st.expander, and st.metric.
     
     OUTPUT: Raw Python code only.
     """
@@ -112,6 +116,11 @@ st.info("⚠️ Use Freighter Wallet (Testnet)")
 st.write("A Living Library of Evolutionary dApps.")
 """)
 
+def clean_filename(name):
+    # Keep only alphanumeric and spaces, then replace spaces with underscores
+    clean = re.sub(r'[^a-zA-Z0-9 ]', '', name)
+    return clean.strip().replace(" ", "_").lower()
+
 def main():
     ensure_structure()
     existing_files = [f for f in os.listdir(PAGES_DIR) if f.endswith(".py")]
@@ -123,7 +132,14 @@ def main():
     
     if spec:
         code = build_polished_dapp(spec, cycle)
-        safe_name = spec['human_name'].replace(" ", "_").replace("'", "").lower()
+        
+        # NEW: Clean filename logic (removes colons, dashes, etc.)
+        safe_name = clean_filename(spec['human_name'])
+        
+        # Ensure it's not too long
+        if len(safe_name) > 30:
+            safe_name = safe_name[:30]
+            
         filename = f"{cycle:03d}_{safe_name}.py"
         filepath = os.path.join(PAGES_DIR, filename)
         
