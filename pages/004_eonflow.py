@@ -355,7 +355,9 @@ def freighter_connector(key=None):
     """
     # Render the component. It returns the last JSON message posted to `window.parent`.
     # `height` and `width` are minimal since the iframe is just a communication channel.
-    component_result = html(full_html, height=1, width=1, scrolling=False, key=key)
+    # Use the explicit path to be safe, and remove the variable assignment
+import streamlit.components.v1 as components
+components.html(full_html, height=1, width=1, scrolling=False)
 
     # Process the result received from the JavaScript component
     if component_result:
