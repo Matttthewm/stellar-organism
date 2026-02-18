@@ -30,27 +30,46 @@ STELLAR_OPS = [
     "BeginSponsoringFutureReserves", "RevokeSponsorship"
 ]
 
-# --- 1. THE ARCHITECT ---
+# --- 1. THE ARCHITECT (Variety Seeker) ---
 def conceive_holistic_system(history_summary):
-    print(f"\n🧠 Conceiving Holistic System...")
+    print(f"\n🧠 Conceiving System (Focus: Variety)...")
     num_ops = random.randint(3, 5) 
     ingredients = random.sample(STELLAR_OPS, num_ops)
     
+    # Randomize the "Vibe" to force visual diversity
+    vibes = [
+        "Cyberpunk/High-Tech", "Organic/Nature-Inspired", "Retro/Pixel-Art", 
+        "Minimalist/Swiss-Design", "Mystical/Arcane", "Industrial/Blueprint",
+        "Playful/Gamified"
+    ]
+    selected_vibe = random.choice(vibes)
+
     prompt = f"""
-    You are the 'Stellar Organism'. A visionary software architect.
+    You are the 'Stellar Organism'. You are an avant-garde software creator.
     
-    YOUR RAW MATERIALS: {ingredients}
+    YOUR INGREDIENTS (Stellar Operations): {ingredients}
+    RECENT HISTORY: {history_summary}
     
     OBJECTIVE: 
-    Invent a 'Holistic System' (dApp) that combines these primitives into a coherent product.
+    Invent a 'Stellar dApp' that uses these primitives.
     
-    HISTORY: {history_summary}
+    CRITICAL CREATIVE INSTRUCTION:
+    Look at the 'RECENT HISTORY'. Do not repeat the same themes, naming conventions, or styles as the previous apps.
+    If the last app was "Corporate Finance", make this one "Playful Game".
+    If the last app was "Abstract", make this one "Utilitarian".
+    
+    NAMING:
+    - You are allowed to use any words, but try to avoid generic Fintech names (like "Flow", "Link", "Pay") unless necessary.
+    - Be creative. Metaphorical names are encouraged (e.g., "Digital_Garden", "Time_Capsule", "Neon_Ledger").
+    
+    VISUAL STYLE:
+    - This app MUST have a "{selected_vibe}" aesthetic.
     
     OUTPUT JSON:
     {{
-        "human_name": "Short Punchy Name", 
-        "system_concept": "The interaction of primitives.",
-        "visual_style": "Minimalist, High-Contrast, Futuristic",
+        "human_name": "The Name", 
+        "system_concept": "1-sentence pitch.",
+        "visual_style": "{selected_vibe}",
         "ingredients": {json.dumps(ingredients)}
     }}
     """
@@ -65,20 +84,20 @@ def conceive_holistic_system(history_summary):
         print(f"   -> Brain Fog: {e}")
         return None
 
-# --- 2. THE ENGINEER ---
+# --- 2. THE ENGINEER (Strict Builder) ---
 def build_polished_dapp(spec, cycle):
-    print(f"⚡ Engineering App {cycle}: {spec['human_name']}...")
+    print(f"⚡ Engineering App {cycle}: {spec['human_name']} ({spec['visual_style']})...")
     
     prompt = f"""
-    You are a Senior Streamlit Developer focusing on UI/UX.
+    You are a Senior Streamlit Developer.
     
-    TASK: Build a production-ready dApp.
+    TASK: Build a functional dApp based on this concept.
     
-    APP: {spec['human_name']}
+    APP NAME: {spec['human_name']}
     CONCEPT: {spec['system_concept']}
-    STYLE: {spec['visual_style']}
+    STYLE: {spec['visual_style']} (Reflect this in the CSS!)
     
-    MANDATES:
+    MANDATES (DO NOT BREAK THESE):
     1. Freighter Integration (st.components.v1.html + signTransaction).
     2. Stellar SDK for XDR.
     3. Custom CSS for style "{spec['visual_style']}".
@@ -92,6 +111,7 @@ def build_polished_dapp(spec, cycle):
        - NEVER import 'Ed22519PublicKeyInvalidError'. Use 'ValueError' for key validation.
        - NEVER import 'AssetType'.
     8. Access operations via the module, e.g., 'stellar_sdk.ChangeTrust(...)'.
+    9. NEVER pass 'timeout' to 'Server()'. Use 'Server(HORIZON_URL)' only.
     
     OUTPUT: Raw Python code only.
     """
@@ -123,6 +143,7 @@ st.write("A Living Library of Evolutionary dApps.")
 """)
 
 def clean_filename(name):
+    # Keep only alphanumeric and spaces, then replace spaces with underscores
     clean = re.sub(r'[^a-zA-Z0-9 ]', '', name)
     return clean.strip().replace(" ", "_").lower()
 
