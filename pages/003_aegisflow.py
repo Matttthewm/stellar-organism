@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit.components.v1 import html
-from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset, BadRequestError, NotFoundError
+from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset
+from stellar_sdk.exceptions import BadRequestError, NotFoundError
 from stellar_sdk.exceptions import Ed22519PublicKeyInvalidError # Need this for Keypair.from_public_key validation
 import json # For parsing errors from Horizon
 import time # For sleep when polling, though not directly used in final structure
