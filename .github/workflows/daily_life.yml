@@ -14,11 +14,13 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # <--- IMPORTANT: Gets full history to prevent conflicts
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'  # <--- THE FIX (Upgraded from 3.9)
+        python-version: '3.11'
 
     - name: Install Dependencies
       run: |
@@ -35,5 +37,12 @@ jobs:
         git config --global user.name "Stellar Organism"
         git config --global user.email "organism@stellar.ai"
         git add pages/
-        git commit -m "Cycle: New dApp Generated" || echo "No changes to commit"
-        git push
+        # Check if there are changes before committing
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Cycle: New dApp Generated"
+          # THE FIX: Pull latest changes before pushing
+          git pull --rebase origin main
+          git push
+        fi
