@@ -5,21 +5,22 @@ from stellar_sdk import (
     Server,
     Network,
     Asset,
-    AssetType,
+    Memo,
+    MuxedAccount
+)
+# We import operations specifically to avoid "ImportError"
+from stellar_sdk.operation import (
     ChangeTrust,
     CreatePassiveSellOffer,
     PathPaymentStrictReceive,
     ClaimClaimableBalance,
-    SetOptions,
-    Account,
-    Memo,
-    MuxedAccount
+    SetOptions
 )
-from stellar_sdk.exceptions import NoMuxedAccountError, BadSignatureError
+from stellar_sdk.exceptions import BadRequestError, BadSignatureError
 import json
 import base64
 import asyncio
-import streamlit.components.v1 as components # Import components
+import streamlit.components.v1 as components 
 
 # --- Configuration ---
 HORIZON_TESTNET = "https://horizon-testnet.stellar.org"
