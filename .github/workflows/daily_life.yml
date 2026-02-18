@@ -9,30 +9,31 @@ jobs:
   evolve:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # CRITICAL: Allows the bot to write code to your repo
-      
+      contents: write
+    
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'  # <--- THE FIX (Upgraded from 3.9)
 
-      - name: 📦 Install Dependencies
-        run: |
-          pip install -r requirements.txt
+    - name: Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: 🧬 Run The Organism
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python organism.py
+    - name: Run The Organism
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: python organism.py
 
-      - name: 🐙 Push New Life
-        run: |
-          git config --global user.name "Stellar Organism"
-          git config --global user.email "organism@stellar.ai"
-          git add .
-          git commit -m "Cycle: New dApp Generated" || echo "No changes to commit"
-          git push
+    - name: Commit and Push Evolution
+      run: |
+        git config --global user.name "Stellar Organism"
+        git config --global user.email "organism@stellar.ai"
+        git add pages/
+        git commit -m "Cycle: New dApp Generated" || echo "No changes to commit"
+        git push
