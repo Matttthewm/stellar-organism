@@ -29,7 +29,7 @@ from streamlit.components.v1 import html
 # --- Constants ---
 HORIZON_URL = "https://horizon-testnet.stellar.org" # Using Testnet for development
 NETWORK_PASSPHRASE = Network.TESTNET_NETWORK_PASSPHRASE
-SERVER = Server(HORIZON_URL, timeout=30)
+SERVER = Server(HORIZON_URL)
 
 # --- Custom CSS for Minimalist, High-Contrast, Futuristic Style ---
 def apply_custom_css():
