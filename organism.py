@@ -19,9 +19,15 @@ if not API_KEY:
     print("❌ CRITICAL ERROR: API Key missing.")
     exit(1)
 
-# --- STANDARD LIBRARY SETUP ---
+# --- MODEL SETUP (The Hybrid Brain) ---
 genai.configure(api_key=API_KEY)
-MODEL_NAME = 'gemini-2.5-flash'
+
+# Use Flash for the "Idea" (High limits, good creativity)
+ARCHITECT_MODEL = 'gemini-2.0-flash' 
+
+# Use Pro for the "Code" (Strict adherence, logic, but lower limits)
+# Note: If this hits rate limits, it will fallback to Flash automatically
+ENGINEER_MODEL = 'gemini-2.0-pro-exp-02-05' 
 
 STELLAR_OPS = [
     "ManageData", "Payment", "PathPaymentStrictReceive", "ManageBuyOffer",
@@ -32,7 +38,7 @@ STELLAR_OPS = [
 
 # --- 1. THE ARCHITECT (Variety Engine) ---
 def conceive_holistic_system(history_summary):
-    print(f"\n🧠 Conceiving System (Focus: Variety)...")
+    print(f"\n🧠 Conceiving System (Model: {ARCHITECT_MODEL})...")
     num_ops = random.randint(3, 5) 
     ingredients = random.sample(STELLAR_OPS, num_ops)
     
@@ -66,19 +72,27 @@ def conceive_holistic_system(history_summary):
     }}
     """
     try:
-        model = genai.GenerativeModel(MODEL_NAME)
+        model = genai.GenerativeModel(ARCHITECT_MODEL)
         response = model.generate_content(
             prompt,
             generation_config={"response_mime_type": "application/json"}
         )
         return json.loads(response.text)
     except Exception as e:
-        print(f"   -> Brain Fog: {e}")
+        print(f"   -> Brain Fog (Architect): {e}")
         return None
 
 # --- 2. THE ENGINEER (Strict Builder) ---
 def build_polished_dapp(spec, cycle):
-    print(f"⚡ Engineering App {cycle}: {spec['human_name']} ({spec['visual_style']})...")
+    # Try Pro first, fallback to Flash if we hit the daily limit
+    try:
+        current_model = ENGINEER_MODEL
+        print(f"⚡ Engineering App {cycle} (Model: {current_model})...")
+        model = genai.GenerativeModel(current_model)
+    except:
+        current_model = ARCHITECT_MODEL
+        print(f"⚠️ Pro Limit Hit? Falling back to {current_model}...")
+        model = genai.GenerativeModel(current_model)
     
     prompt = f"""
     You are a Senior Streamlit Developer.
@@ -127,18 +141,23 @@ def build_polished_dapp(spec, cycle):
               key = st.session_state.demo_key
               st.warning("Using Ephemeral Demo Keys")
     
+    12. ROBUSTNESS:
+        - Wrap key logic in try/except blocks to prevent Streamlit 'red box' crashes.
+    
     OUTPUT: Raw Python code only.
     """
     
-    model = genai.GenerativeModel(MODEL_NAME)
-    response = model.generate_content(prompt)
-    
-    code = response.text
-    if "```python" in code:
-        code = code.split("```python")[1].split("```")[0]
-    elif "```" in code:
-        code = code.replace("```", "")
-    return code.strip()
+    try:
+        response = model.generate_content(prompt)
+        code = response.text
+        if "```python" in code:
+            code = code.split("```python")[1].split("```")[0]
+        elif "```" in code:
+            code = code.replace("```", "")
+        return code.strip()
+    except Exception as e:
+        print(f"   -> Engineering Collapse: {e}")
+        return None
 
 # --- 3. INFRASTRUCTURE & MAIN ---
 def ensure_structure():
@@ -171,17 +190,19 @@ def main():
     
     if spec:
         code = build_polished_dapp(spec, cycle)
-        
-        safe_name = clean_filename(spec['human_name'])
-        if len(safe_name) > 30:
-            safe_name = safe_name[:30]
+        if code:
+            safe_name = clean_filename(spec['human_name'])
+            if len(safe_name) > 30:
+                safe_name = safe_name[:30]
+                
+            filename = f"{cycle:03d}_{safe_name}.py"
+            filepath = os.path.join(PAGES_DIR, filename)
             
-        filename = f"{cycle:03d}_{safe_name}.py"
-        filepath = os.path.join(PAGES_DIR, filename)
-        
-        with open(filepath, "w") as f:
-            f.write(code) 
-        print(f"✅ Created: {filename}")
+            with open(filepath, "w") as f:
+                f.write(code) 
+            print(f"✅ Created: {filename}")
+        else:
+            print("❌ Engineering Failed.")
     else:
         print("❌ Conception Failed.")
 
