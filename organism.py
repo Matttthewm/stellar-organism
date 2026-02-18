@@ -1,8 +1,7 @@
 import os
 import random
 import json
-import google.generativeai as genai
-import time
+from google import genai
 
 # --- CONFIGURATION ---
 try:
@@ -18,11 +17,8 @@ if not API_KEY:
     print("❌ CRITICAL ERROR: API Key missing.")
     exit(1)
 
-# --- BRAIN TRANSPLANT: STANDARD LIBRARY SETUP ---
-genai.configure(api_key=API_KEY)
-
-# Use the standard Flash model
-MODEL_NAME = 'gemini-1.5-flash'
+# Initialize the Modern Client
+client = genai.Client(api_key=API_KEY)
 
 STELLAR_OPS = [
     "ManageData", "Payment", "PathPaymentStrictReceive", "ManageBuyOffer",
@@ -56,11 +52,11 @@ def conceive_holistic_system(history_summary):
     }}
     """
     try:
-        model = genai.GenerativeModel(MODEL_NAME)
-        # Force JSON response type
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
+        # Using the standard modern call
+        response = client.models.generate_content(
+            model="gemini-1.5-flash", 
+            contents=prompt,
+            config={'response_mime_type': 'application/json'}
         )
         return json.loads(response.text)
     except Exception as e:
@@ -88,8 +84,7 @@ def build_polished_dapp(spec, cycle):
     OUTPUT: Raw Python code only.
     """
     
-    model = genai.GenerativeModel(MODEL_NAME)
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
     
     code = response.text
     if "```python" in code:
