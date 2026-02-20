@@ -13,78 +13,63 @@ st.markdown("""
         
         /* The icon container - FIXED SQUISHING */
         .app-icon {
-            width: 80px;
-            min-width: 80px;
-            height: 80px;
+            width: 75px;
+            min-width: 75px;
+            height: 75px;
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 38px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             flex-shrink: 0; 
         }
         
-        /* Typography for Title and Subtitle */
-        .app-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .app-subtitle {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Style the Streamlit native link to look like an App Store button */
+        /* Style the Streamlit native link to look like a Title */
         div[data-testid="stPageLink-NavLink"] {
-            background-color: #f0f0f5; 
-            border-radius: 20px;
-            padding: 4px 18px;
-            width: fit-content;
-            display: flex;
-            justify-content: center;
-            transition: all 0.2s;
+            background-color: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            text-decoration: none !important;
+            margin-bottom: -5px;
         }
         div[data-testid="stPageLink-NavLink"] p {
-            color: #007aff !important;
+            color: inherit !important;
             margin: 0 !important;
-            font-weight: 700 !important;
-            font-size: 13px !important;
+            font-weight: 600 !important;
+            font-size: 17px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s;
         }
-        div[data-testid="stPageLink-NavLink"]:hover {
-            background-color: #e0e0e5;
-            transform: scale(1.03);
+        div[data-testid="stPageLink-NavLink"]:hover p {
+            color: #007aff !important; /* Turns blue on hover */
         }
 
-        /* Dark Mode Adjustments */
         @media (prefers-color-scheme: dark) {
-            div[data-testid="stPageLink-NavLink"] {
-                background-color: #3A3A3C;
-            }
-            div[data-testid="stPageLink-NavLink"] p {
-                color: #0A84FF !important;
-            }
-            div[data-testid="stPageLink-NavLink"]:hover {
-                background-color: #4A4A4C;
-            }
             .app-icon {
                 box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             }
+            div[data-testid="stPageLink-NavLink"]:hover p {
+                color: #0A84FF !important;
+            }
+        }
+        
+        /* Subtitle styling */
+        .app-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         /* Adjust column padding to tighten the grid */
         [data-testid="column"] {
             padding: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -133,18 +118,16 @@ else:
 
                 # Build the layout for each app card
                 with cols[j]:
-                    icon_col, text_col = st.columns([1, 2.5], gap="small")
-                    
-                    with icon_col:
-                        # Draw the large custom icon
-                        st.markdown(f'<div class="app-icon" style="background: {grad};">{emoji}</div>', unsafe_allow_html=True)
-                    
-                    with text_col:
-                        # Draw the Title, Subtitle, and Native OPEN Button safely
-                        st.markdown(f'''
-                            <div class="app-title" title="{title}">{title}</div>
-                            <div class="app-subtitle">Stellar dApp</div>
-                        ''', unsafe_allow_html=True)
-                        st.page_link(f"pages/{file}", label="OPEN", icon=None)
+                    with st.container(border=True): # Adds a subtle border around the whole "card"
+                        icon_col, text_col = st.columns([1, 2.5], gap="small", vertical_alignment="center")
+                        
+                        with icon_col:
+                            # Draw the large custom icon
+                            st.markdown(f'<div class="app-icon" style="background: {grad};">{emoji}</div>', unsafe_allow_html=True)
+                        
+                        with text_col:
+                            # Native routing link acts as the clickable title
+                            st.page_link(f"pages/{file}", label=title, icon=None)
+                            st.markdown('<div class="app-subtitle">Stellar dApp</div>', unsafe_allow_html=True)
                 
             st.write("") # Vertical spacer between rows
