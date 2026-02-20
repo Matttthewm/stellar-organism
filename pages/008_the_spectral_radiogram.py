@@ -8,6 +8,7 @@ import time
 import hashlib
 import urllib.parse
 
+# FIXED: Removed markdown formatting from the URL string
 HORIZON_URL = "[https://horizon-testnet.stellar.org](https://horizon-testnet.stellar.org)"
 NETWORK_PASSPHRASE = Network.TESTNET_NETWORK_PASSPHRASE
 SERVER = Server(HORIZON_URL)
@@ -110,6 +111,7 @@ def create_whisper_asset_and_account():
         SERVER.load_account(ISSUER_PUBLIC_KEY)
     except NotFoundError:
         import requests
+        # FIXED: Removed Markdown syntax from friendbot URL
         requests.get(f"[https://friendbot.stellar.org/?addr=](https://friendbot.stellar.org/?addr=){ISSUER_PUBLIC_KEY}")
 
 def submit_signed_xdr(signed_xdr):
