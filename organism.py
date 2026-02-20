@@ -33,7 +33,7 @@ def conceive_holistic_system(history_summary):
     num_ops = random.randint(3, 5) 
     ingredients = random.sample(STELLAR_OPS, num_ops)
     
-    vibes = ["Cyberpunk", "Organic/Nature", "Retro/Pixel-Art", "Minimalist", "Mystical"]
+    vibes = ["Cyberpunk/High-Tech", "Organic/Nature-Inspired", "Retro/Pixel-Art", "Minimalist/Swiss-Design", "Mystical/Arcane"]
     selected_vibe = random.choice(vibes)
 
     prompt = f"""
@@ -92,6 +92,7 @@ def build_polished_dapp(spec, cycle):
        - 'import requests' (Required for friendbot)
     
     6. STRICT SYNTAX & ANTI-HALLUCINATION RULES:
+       - URLS: NEVER wrap URLs in Markdown. Use pure strings. Example: HORIZON_URL = "https://horizon-testnet.stellar.org" (No brackets or parenthesis).
        - PASSPHRASE: MUST use `Network.TESTNET_NETWORK_PASSPHRASE`. Never `TESTNET_PASSPHRASE`.
        - ASSET CODES: 1-12 Alphanumeric characters ONLY. NO UNDERSCORES (e.g., Use "FRAGA", never "FRAG_A").
        - FRIENDBOT: The python SDK `Server` does NOT have a `.friendbot()` method. You MUST use: `requests.get(f"https://friendbot.stellar.org/?addr={{public_key}}")`
