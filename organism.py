@@ -2,7 +2,8 @@ import os
 import random
 import json
 import re
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # --- CONFIGURATION ---
 try:
@@ -18,7 +19,9 @@ if not API_KEY:
     print("❌ CRITICAL ERROR: API Key missing.")
     exit(1)
 
-genai.configure(api_key=API_KEY)
+# Initialize the NEW Google GenAI Client
+client = genai.Client(api_key=API_KEY)
+
 ARCHITECT_MODEL = 'gemini-2.0-flash' 
 ENGINEER_MODEL = 'gemini-2.0-pro-exp-02-05' 
 
@@ -57,20 +60,21 @@ def conceive_holistic_system(history_summary):
     }}
     """
     try:
-        model = genai.GenerativeModel(ARCHITECT_MODEL)
-        response = model.generate_content(prompt, generation_config={"response_mime_type": "application/json"})
+        response = client.models.generate_content(
+            model=ARCHITECT_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json"
+            )
+        )
         return json.loads(response.text)
     except Exception as e:
         print(f"   -> Brain Fog: {e}")
+        if "429" in str(e):
+            print("   🛑 QUOTA EXCEEDED: You have hit the Gemini Free Tier limits. The Organism must rest until the quota resets.")
         return None
 
 def build_polished_dapp(spec, cycle):
-    try:
-        print(f"⚡ Engineering App {cycle} (Model: {ENGINEER_MODEL})...")
-        model = genai.GenerativeModel(ENGINEER_MODEL)
-    except:
-        model = genai.GenerativeModel(ARCHITECT_MODEL)
-    
     prompt = f"""
     You are a Senior Streamlit Developer.
     TASK: Build a functional dApp based on this concept.
@@ -101,17 +105,35 @@ def build_polished_dapp(spec, cycle):
     
     OUTPUT: Raw Python code only.
     """
+    
+    response = None
     try:
-        response = model.generate_content(prompt)
+        print(f"⚡ Engineering App {cycle} (Model: {ENGINEER_MODEL})...")
+        response = client.models.generate_content(
+            model=ENGINEER_MODEL,
+            contents=prompt
+        )
+    except Exception as e:
+        print(f"⚠️ Pro Limit Hit? ({e}). Falling back to {ARCHITECT_MODEL}...")
+        try:
+            response = client.models.generate_content(
+                model=ARCHITECT_MODEL,
+                contents=prompt
+            )
+        except Exception as fallback_e:
+            print(f"   -> Engineering Collapse: {fallback_e}")
+            if "429" in str(fallback_e):
+                print("   🛑 QUOTA EXCEEDED on fallback model. The Organism is forced to sleep.")
+            return None
+    
+    if response and response.text:
         code = response.text
         if "```python" in code:
             code = code.split("```python")[1].split("```")[0]
         elif "```" in code:
             code = code.replace("```", "")
         return code.strip()
-    except Exception as e:
-        print(f"   -> Engineering Collapse: {e}")
-        return None
+    return None
 
 def ensure_structure():
     if not os.path.exists(PAGES_DIR): os.makedirs(PAGES_DIR)
