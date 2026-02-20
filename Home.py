@@ -11,28 +11,10 @@ st.markdown("""
         /* Hide the default sidebar */
         [data-testid="stSidebarNav"] {display: none;}
         
-        /* App Card Link Wrapper */
-        .app-card-link {
-            text-decoration: none !important;
-            color: inherit !important;
-            display: block;
-            border-radius: 18px;
-            transition: transform 0.2s, background-color 0.2s;
-            padding: 10px;
-        }
-        .app-card-link:hover {
-            transform: scale(1.02);
-            background-color: rgba(0, 0, 0, 0.03);
-        }
-        @media (prefers-color-scheme: dark) {
-            .app-card-link:hover {
-                background-color: rgba(255, 255, 255, 0.05);
-            }
-        }
-        
-        /* The icon container */
+        /* The icon container - FIXED SQUISHING */
         .app-icon {
             width: 80px;
+            min-width: 80px;
             height: 80px;
             border-radius: 18px;
             display: flex;
@@ -40,7 +22,7 @@ st.markdown("""
             justify-content: center;
             font-size: 40px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            margin-bottom: 10px;
+            flex-shrink: 0; 
         }
         
         /* Typography for Title and Subtitle */
@@ -56,15 +38,53 @@ st.markdown("""
         .app-subtitle {
             font-size: 13px;
             color: #888;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* Style the Streamlit native link to look like an App Store button */
+        div[data-testid="stPageLink-NavLink"] {
+            background-color: #f0f0f5; 
+            border-radius: 20px;
+            padding: 4px 18px;
+            width: fit-content;
+            display: flex;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        div[data-testid="stPageLink-NavLink"] p {
+            color: #007aff !important;
+            margin: 0 !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+        }
+        div[data-testid="stPageLink-NavLink"]:hover {
+            background-color: #e0e0e5;
+            transform: scale(1.03);
+        }
+
+        /* Dark Mode Adjustments */
+        @media (prefers-color-scheme: dark) {
+            div[data-testid="stPageLink-NavLink"] {
+                background-color: #3A3A3C;
+            }
+            div[data-testid="stPageLink-NavLink"] p {
+                color: #0A84FF !important;
+            }
+            div[data-testid="stPageLink-NavLink"]:hover {
+                background-color: #4A4A4C;
+            }
+            .app-icon {
+                box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            }
         }
         
         /* Adjust column padding to tighten the grid */
         [data-testid="column"] {
             padding: 10px;
+            margin-bottom: 15px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -89,10 +109,8 @@ else:
             row_files = files[i:i+3]
             
             for j, file in enumerate(row_files):
-                # Clean up the name (e.g., "001_nexusflow.py" -> "Nexusflow")
+                # Clean up the name
                 name = file.replace('.py', '')
-                url_path = name # Streamlit natively routes using the filename without .py
-                
                 clean_name = re.sub(r'^\d+_', '', name) # Removes the "001_" prefix
                 title = clean_name.replace('_', ' ').title()
 
@@ -113,19 +131,20 @@ else:
                 grad = gradients[hash_val % len(gradients)]
                 emoji = emojis[hash_val % len(emojis)]
 
-                # Build the layout for each app card, entirely wrapped in a clickable link
+                # Build the layout for each app card
                 with cols[j]:
-                    card_html = f"""
-                    <a href="{url_path}" target="_self" class="app-card-link">
-                        <div style="display: flex; gap: 15px; align-items: center;">
-                            <div class="app-icon" style="background: {grad};">{emoji}</div>
-                            <div>
-                                <div class="app-title" title="{title}">{title}</div>
-                                <div class="app-subtitle">Stellar dApp</div>
-                            </div>
-                        </div>
-                    </a>
-                    """
-                    st.markdown(card_html, unsafe_allow_html=True)
+                    icon_col, text_col = st.columns([1, 2.5], gap="small")
+                    
+                    with icon_col:
+                        # Draw the large custom icon
+                        st.markdown(f'<div class="app-icon" style="background: {grad};">{emoji}</div>', unsafe_allow_html=True)
+                    
+                    with text_col:
+                        # Draw the Title, Subtitle, and Native OPEN Button safely
+                        st.markdown(f'''
+                            <div class="app-title" title="{title}">{title}</div>
+                            <div class="app-subtitle">Stellar dApp</div>
+                        ''', unsafe_allow_html=True)
+                        st.page_link(f"pages/{file}", label="OPEN", icon=None)
                 
             st.write("") # Vertical spacer between rows
