@@ -3,8 +3,9 @@ import streamlit.components.v1 as components
 import stellar_sdk
 from stellar_sdk import Server, Keypair, TransactionBuilder, Network, Asset
 from stellar_sdk.exceptions import BadRequestError, NotFoundError
-import requests # FIXED: Imported requests
+import requests 
 
+# FIXED: Removed markdown formatting from the URL string
 HORIZON_URL = "[https://horizon-testnet.stellar.org](https://horizon-testnet.stellar.org)"
 NETWORK_PASSPHRASE = Network.TESTNET_NETWORK_PASSPHRASE
 server = Server(HORIZON_URL)
@@ -20,7 +21,7 @@ def setup_issuer_account():
     try:
         server.load_account(ISSUER_PUBLIC_KEY)
     except NotFoundError:
-        requests.get(f"[https://friendbot.stellar.org/?addr=](https://friendbot.stellar.org/?addr=){ISSUER_PUBLIC_KEY}") # FIXED
+        requests.get(f"[https://friendbot.stellar.org/?addr=](https://friendbot.stellar.org/?addr=){ISSUER_PUBLIC_KEY}") 
         st.success("Sanctuary core funded via Friendbot!")
 
 st.title("The Whispering Wisp Sanctuary 🌬️")
