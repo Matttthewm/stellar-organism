@@ -3,13 +3,32 @@ import os
 import re
 import hashlib
 
-st.set_page_config(page_title="App Store | The Stellar Organism", page_icon="🧬", layout="wide")
+st.set_page_config(page_title="The Stellar Organism", page_icon="🧬", layout="wide")
 
-# Hide default sidebar navigation & apply Apple App Store CSS
+# Hide default sidebar navigation & apply Custom App Card CSS
 st.markdown("""
     <style>
         /* Hide the default sidebar */
         [data-testid="stSidebarNav"] {display: none;}
+        
+        /* App Card Link Wrapper */
+        .app-card-link {
+            text-decoration: none !important;
+            color: inherit !important;
+            display: block;
+            border-radius: 18px;
+            transition: transform 0.2s, background-color 0.2s;
+            padding: 10px;
+        }
+        .app-card-link:hover {
+            transform: scale(1.02);
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        @media (prefers-color-scheme: dark) {
+            .app-card-link:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+        }
         
         /* The icon container */
         .app-icon {
@@ -29,59 +48,18 @@ st.markdown("""
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 2px;
-            margin-top: -5px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: inherit;
         }
         
         .app-subtitle {
             font-size: 13px;
             color: #888;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        /* Style the Streamlit page_link to look like the "GET" button */
-        div[data-testid="stPageLink-NavLink"] {
-            background-color: #f0f0f5; 
-            border-radius: 20px;
-            padding: 2px 14px;
-            width: 75px;
-            display: flex;
-            justify-content: center;
-            border: none;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        div[data-testid="stPageLink-NavLink"] p {
-            color: #007aff !important;
-            margin: 0 !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-        }
-        div[data-testid="stPageLink-NavLink"]:hover {
-            background-color: #e0e0e5;
-            transform: scale(1.02);
-        }
-
-        /* Dark Mode Adjustments */
-        @media (prefers-color-scheme: dark) {
-            div[data-testid="stPageLink-NavLink"] {
-                background-color: #3A3A3C;
-            }
-            div[data-testid="stPageLink-NavLink"] p {
-                color: #0A84FF !important;
-            }
-            div[data-testid="stPageLink-NavLink"]:hover {
-                background-color: #4A4A4C;
-            }
-            .app-icon {
-                box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            }
         }
         
         /* Adjust column padding to tighten the grid */
@@ -91,8 +69,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("Apps We Love Right Now")
-st.markdown("### *A Living Library of Evolutionary dApps on the Stellar Network*")
+st.title("🧬 The Stellar Organism")
+st.markdown("### *A self-evolving library of autonomous dApps living on the Stellar Network.*")
 st.write("")
 st.write("")
 
@@ -113,8 +91,10 @@ else:
             for j, file in enumerate(row_files):
                 # Clean up the name (e.g., "001_nexusflow.py" -> "Nexusflow")
                 name = file.replace('.py', '')
-                name = re.sub(r'^\d+_', '', name) # Removes the "001_" prefix
-                title = name.replace('_', ' ').title()
+                url_path = name # Streamlit natively routes using the filename without .py
+                
+                clean_name = re.sub(r'^\d+_', '', name) # Removes the "001_" prefix
+                title = clean_name.replace('_', ' ').title()
 
                 # Generate a deterministic icon color & emoji based on the app's name
                 hash_val = int(hashlib.md5(title.encode()).hexdigest(), 16)
@@ -133,20 +113,19 @@ else:
                 grad = gradients[hash_val % len(gradients)]
                 emoji = emojis[hash_val % len(emojis)]
 
-                # Build the layout for each app card
+                # Build the layout for each app card, entirely wrapped in a clickable link
                 with cols[j]:
-                    icon_col, text_col = st.columns([1, 2.5], gap="small")
-                    
-                    with icon_col:
-                        # Draw the large custom icon
-                        st.markdown(f'<div class="app-icon" style="background: {grad};">{emoji}</div>', unsafe_allow_html=True)
-                    
-                    with text_col:
-                        # Draw the Title, Subtitle, and Native GET Button
-                        st.markdown(f'''
-                            <div class="app-title" title="{title}">{title}</div>
-                            <div class="app-subtitle">Stellar dApp</div>
-                        ''', unsafe_allow_html=True)
-                        st.page_link(f"pages/{file}", label="GET", icon=None)
+                    card_html = f"""
+                    <a href="{url_path}" target="_self" class="app-card-link">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div class="app-icon" style="background: {grad};">{emoji}</div>
+                            <div>
+                                <div class="app-title" title="{title}">{title}</div>
+                                <div class="app-subtitle">Stellar dApp</div>
+                            </div>
+                        </div>
+                    </a>
+                    """
+                    st.markdown(card_html, unsafe_allow_html=True)
                 
             st.write("") # Vertical spacer between rows
