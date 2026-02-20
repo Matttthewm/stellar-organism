@@ -117,8 +117,11 @@ def ensure_structure():
     if not os.path.exists(PAGES_DIR): os.makedirs(PAGES_DIR)
 
 def clean_filename(name):
+    # Aggressively strip colons and special characters that break Streamlit routing
     clean = re.sub(r'[^a-zA-Z0-9 ]', '', name)
-    return clean.strip().replace(" ", "_").lower()
+    # Replaces any multiple spaces with a single underscore safely
+    clean = re.sub(r'\s+', '_', clean.strip())
+    return clean.lower()
 
 def main():
     ensure_structure()
